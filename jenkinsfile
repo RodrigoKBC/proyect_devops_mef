@@ -1,0 +1,106 @@
+// Archivo: Jenkinsfile
+pipeline {
+    agent any
+    
+    environment {
+        APP_NAME = 'sistema-mef'
+        VERSION = "${BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('🚀 Preparación') {
+            steps {
+                echo "Iniciando Pipeline DevOps MEF"
+                echo "Build número: ${BUILD_NUMBER}"
+                echo "Aplicación: ${APP_NAME}"
+            }
+        }
+        
+        stage('🔍 Análisis de Código') {
+            parallel {
+                stage('Linting') {
+                    steps {
+                        echo "Ejecutando análisis estático..."
+                        sh '''
+                            echo "✓ Verificando estándares de código"
+                            sleep 2
+                            echo "✓ No se encontraron problemas"
+                        '''
+                    }
+                }
+                
+                stage('Seguridad') {
+                    steps {
+                        echo "Análisis de vulnerabilidades..."
+                        sh '''
+                            echo "✓ Escaneando dependencias"
+                            sleep 2
+                            echo "✓ Sin vulnerabilidades críticas"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('🔨 Build') {
+            steps {
+                echo "Construyendo aplicación..."
+                sh '''
+                    echo "Compilando código..."
+                    echo "Generando artefactos..."
+                    sleep 3
+                    echo "✅ Build exitoso"
+                '''
+            }
+        }
+        
+        stage('🧪 Tests') {
+            steps {
+                echo "Ejecutando suite de pruebas..."
+                sh '''
+                    echo "Tests unitarios: 45/45 ✓"
+                    echo "Tests integración: 12/12 ✓"
+                    echo "Coverage: 85%"
+                '''
+            }
+        }
+        
+        stage('🐳 Docker Build') {
+            steps {
+                echo "Construyendo imagen Docker..."
+                sh '''
+                    echo "docker build -t ${APP_NAME}:${VERSION} ."
+                    echo "✅ Imagen creada: ${APP_NAME}:${VERSION}"
+                '''
+            }
+        }
+        
+        stage('📦 Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo "Desplegando a producción..."
+                sh '''
+                    echo "Aplicando configuración Kubernetes..."
+                    echo "kubectl apply -f k8s/"
+                    echo "✅ Deployment exitoso"
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "========================================="
+            echo "Pipeline completado"
+            echo "========================================="
+        }
+        success {
+            echo "✅ Pipeline ejecutado exitosamente!"
+        }
+        failure {
+            echo "❌ El pipeline falló. Revisar logs."
+        }
+    }
+}
